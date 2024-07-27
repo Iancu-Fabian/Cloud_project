@@ -68,6 +68,6 @@ app.get('/api/members', (req, res) => {
     res.json(sortedMembers);
 });
 
-app.listen(port, () => {
+app.listen(port,'0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
