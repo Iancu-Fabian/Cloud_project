@@ -20,8 +20,9 @@ jobs:
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: MyApplicationName
-        environment_name: MyApplication-Environment
-        version_label: 12345
+        application_name: Ci-cd-pipeline2
+        environment_name: Ci-cd-pipeline2-env
+        existing_bucket_name: elasticbeanstalk-us-east-1-905418239147 
+        version_label: ${{ github.sha }}
         region: us-west-2
         deployment_package: deploy.zip
