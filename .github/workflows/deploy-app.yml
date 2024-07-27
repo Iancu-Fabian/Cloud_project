@@ -13,18 +13,18 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Generate deployment package
-      run: zip -r deploy.zip . -x '*.git*'
+      run: zip -r docker-app.zip . -x '*.git*'
 
     - name: Deploy to EB
       uses: einaregilsson/beanstalk-deploy@v22
       with:
         aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: Ci-cd-pipeline2
-        environment_name: Ci-cd-pipeline2-env
+        application_name: Ci-cd-pipeline
+        environment_name: Ci-cd-pipeline-env
         existing_bucket_name: elasticbeanstalk-us-east-1-905418239147 
         version_label: ${{ github.sha }}
         region: us-east-1
-        deployment_package: deploy.zip
+        deployment_package: docker-app.zip
 
 #deploy script
