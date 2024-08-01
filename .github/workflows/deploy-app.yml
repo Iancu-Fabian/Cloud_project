@@ -1,27 +1,77 @@
-name: deploy app to aws
+name: Deploy to Elastic Beanstalk
+
 on:
   push:
     branches:
-      - master
-
+      -master
+  
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout source code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Generate deployment package
-        run: zip -r docker-app.zip . -x '*.git*'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: Ci-cd-project
-          environment_name: Ci-cd-project-env
-          existing_bucket_name: elasticbeanstalk-eu-north-1-905418239147
-          version_label: ${{ github.sha }}
-          region: eu-north-1
-          deployment_package: docker-app.zip
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Docker images to Amazon ECR
+        env:
+          ECR_REGISTRY: 905418239147.dkr.ecr.eu-north-1.amazonaws.com
+          ECR_REPOSITORY: ci_cd_pipeline
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker-compose -f docker-compose.yaml build
+          docker tag backend:latest $ECR_REGISTRY/$ECR_REPOSITORY/backend:$IMAGE_TAG
+          docker tag frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY/frontend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY/backend:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY/frontend:$IMAGE_TAG
+
+      - name: Generate Dockerrun.aws.json
+        env:
+          AWS_ACCOUNT_ID: 905418239147
+          AWS_REGION: eu-north-1
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          echo '{
+            "AWSEBDockerrunVersion": 2,
+            "containerDefinitions": [
+              {
+                "name": "backend",
+                "image": "'905418239147.dkr.ecr.eu-north-1.amazonaws.com/my-repo/backend:${{ github.sha }}'",
+                "essential": true,
+                "memory": 512,
+                "portMappings": [
+                  {
+                    "containerPort": 5000
+                  }
+                ]
+              },
+              {
+                "name": "frontend",
+                "image": "'905418239147.dkr.ecr.eu-north-1.amazonaws.com/my-repo/frontend:${{ github.sha }}'",
+                "essential": true,
+                "memory": 512,
+                "portMappings": [
+                  {
+                    "containerPort": 3000
+                  }
+                ]
+              }
+            ]
+          }' > Dockerrun.aws.json
+
+      - name: Deploy to Elastic Beanstalk
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-north-1
+        run: |
+          eb init -p docker Ci-cd-project --region eu-north-1
+          eb use Ci-cd-project-env
+          eb deploy

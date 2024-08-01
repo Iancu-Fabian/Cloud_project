@@ -1,0 +1,15 @@
+branch-defaults:
+  default:
+    environment: your-environment-name
+    group_suffix: null
+global:
+  application_name: your-application-name
+  default_platform: Docker
+  default_region: your-region
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  repository: null
+  sc: null
