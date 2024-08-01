@@ -1,0 +1,27 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "backend",
+      "image": "905418239147.dkr.ecr.eu-north-1.amazonaws.com/ci_cd_pipeline/backend:<IMAGE_TAG>",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "containerPort": 5000
+        }
+      ]
+    },
+    {
+      "name": "frontend",
+      "image": "905418239147.dkr.ecr.eu-north-1.amazonaws.com/ci_cd_pipeline/frontend:<IMAGE_TAG>",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "containerPort": 3000
+        }
+      ]
+    }
+  ]
+}
