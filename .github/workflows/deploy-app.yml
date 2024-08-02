@@ -3,42 +3,40 @@ name: Deploy to Elastic Beanstalk
 on:
   push:
     branches:
-      -master
-  
+      - maaster 
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+    - name: Install dependencies
+      run: |
+        npm install
+        cd ../company
+        npm install
 
-      - name: Build and push Docker images to Amazon ECR
-        env:
-          ECR_REGISTRY: 905418239147.dkr.ecr.eu-north-1.amazonaws.com
-          ECR_REPOSITORY: ci_cd_pipeline
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker-compose -f docker-compose.yaml build
-          docker tag backend:latest $ECR_REGISTRY/$ECR_REPOSITORY/backend:$IMAGE_TAG
-          docker tag frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY/frontend:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY/backend:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY/frontend:$IMAGE_TAG
+    - name: Build company
+      run: |
+        cd company
+        npm run build
+        cd ..
 
-      
-      - name: Deploy to Elastic Beanstalk
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: eu-north-1
-        run: |
-          eb init -p docker Ci-cd-project --region eu-north-1
-          eb use Ci-cd-project-env
-          eb deploy
+    - name: Deploy to Elastic Beanstalk
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: eu-north-1 
+      run: |
+        zip -r app.zip .
+        eb init -p docker Ci-cd-app --region eu-north-1
+        eb use Ci-cd-app-env
+        eb deploy
