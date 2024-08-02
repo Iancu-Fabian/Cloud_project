@@ -1,42 +1,27 @@
-name: Deploy to Elastic Beanstalk
-
+name: deploy app to aws
 on:
   push:
     branches:
-      - maaster 
+      - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'  
+      - name: Generate deployment package
+        run: zip -r docker-app.zip . -x '*.git*'
 
-    - name: Install dependencies
-      run: |
-        npm install
-        cd ../company
-        npm install
-
-    - name: Build company
-      run: |
-        cd company
-        npm run build
-        cd ..
-
-    - name: Deploy to Elastic Beanstalk
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: eu-north-1 
-      run: |
-        zip -r app.zip .
-        eb init -p docker Ci-cd-app --region eu-north-1
-        eb use Ci-cd-app-env
-        eb deploy
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: Ci-cd-project
+          environment_name: Ci-cd-project-env
+          existing_bucket_name: elasticbeanstalk-eu-north-1-905418239147
+          version_label: ${{ github.sha }}
+          region: eu-north-1
+          deployment_package: docker-app.zip
