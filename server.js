@@ -1,9 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const aws = require('aws-sdk');
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
 app.use(cors());
