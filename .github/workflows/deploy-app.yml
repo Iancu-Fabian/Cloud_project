@@ -24,27 +24,23 @@ jobs:
 
       - name: Build and push backend Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/ci-cd-pipeline:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/ci-cd-pipeline:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
 
       - name: Build and push frontend Docker image
         run: |
           cd company
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/ci-cd-pipeline:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/ci-cd-pipeline:latest
-
-      - name: Create deployment package
-        run: |
-          zip -r docker-app.zip docker-compose.yml
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: 'Docker-eb-app'
-          environment_name: 'Docker-eb-app-env'
+          application_name: 'Dockerapp'
+          environment_name: 'Dockerapp-env'
           existing_bucket_name: 'docker-bucket1207'
           version_label: ${{ github.sha }}
           region: 'eu-north-1'
-          deployment_package: 'docker-app.zip'
+          deployment_package: 'docker-compose.yml'
