@@ -1,17 +1,17 @@
 version: "3.8"
 services:
-  frontend: 
-    build: ./company
+  frontend:
+    image: 'fabian1207/ci-cd-pipeline:latest'
     container_name: react_container
     ports:
-      - '80:3000'
-    stdin_open: true
-    tty: true
+      - '80:80'
+    environment:
+      - NODE_ENV=production
 
   backend:
-    build: .
+    image: 'fabian1207/ci-cd-pipeline:latest'
     container_name: server_container
     ports:
-    - '5000:5000'
-    volumes:
-      - .:/app
+      - '5000:5000'
+    environment:
+      - NODE_ENV=production
