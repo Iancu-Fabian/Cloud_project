@@ -3,17 +3,23 @@ services:
   frontend:
     image: 'fabian1207/frontend:latest'
     container_name: react_container
-    ports:
-      - '80:80'
     environment:
       - NODE_ENV=production
 
   backend:
     image: 'fabian1207/backend:latest'
     container_name: server_container
-    ports:
-      - '5000:5000'
+    Dockerfile: Dockerfile
     environment:
       - NODE_ENV=production
 
-      
+  nginx:
+    image: 'fabian1207/nginx:latest'
+    container_name: nginx_container
+    Dockerfile: Dockerfile-nginx
+    restart: always
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - '80:80'
