@@ -5,13 +5,14 @@ services:
     container_name: react_container
     environment:
       - NODE_ENV=production
+      - REACT_APP_BACKEND_URL = ${REACT_APP_BACKEND_URL}
 
   backend:
     image: 'fabian1207/backend:latest'
     container_name: server_container
     environment:
       - NODE_ENV=production
-      - REACT_APP_BACKEND_URL = ${REACT_APP_BACKEND_URL}
+      
 
   nginx:
     image: 'fabian1207/nginx:latest'
