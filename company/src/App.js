@@ -18,7 +18,7 @@ const App = () => {
 
     const fetchMembers = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/members');
+            const response = await axios.get('http://localhost:8080/api/members');
             setMembers(response.data);
         } catch (error) {
             console.error('Error fetching members', error);
@@ -33,7 +33,7 @@ const App = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/members', form);
+            await axios.post('http://localhost:8080/api/members', form);
             fetchMembers();
             setForm({
                 firstName: '',
