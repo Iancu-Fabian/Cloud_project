@@ -29,13 +29,13 @@ jobs:
 
       - name: Build and push frontend Docker image
         run: |
-          cd company
+          working-directory: company
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
       - name: Build and push nginx Docker image
         run: |
-          cd ../nginx
+          working-directory: nginx
           docker build -t ${{ secrets.DOCKER_USERNAME }}/nginx:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/nginx:latest
 
