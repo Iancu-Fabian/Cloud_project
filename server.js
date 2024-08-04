@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const aws = require('aws-sdk');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -69,6 +68,6 @@ app.get('/api/members', (req, res) => {
     res.json(sortedMembers);
 });
 
-app.listen(port,'0.0.0.0', () => {
+app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
