@@ -20,7 +20,7 @@ const App = () => {
 
     const fetchMembers = async () => {
         try {
-            const response = await axios.get('/api/members');
+            const response = await axios.get('/server/api/members');
             setMembers(response.data);
         } catch (error) {
             console.error('Error fetching members', error);
@@ -35,7 +35,7 @@ const App = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('/api/members', form);
+            await axios.post('/server/api/members', form);
             fetchMembers();
             setForm({
                 firstName: '',
